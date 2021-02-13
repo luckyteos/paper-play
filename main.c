@@ -72,7 +72,7 @@ int main(void){
 
   //Allocate CPU to head process
   Proc_Info *fProc = deQueue(&jQHead);
-  enQueue(fProc, &rQHead);
+  enQueue(fProc, &rQHead); 
   printf("Job Queue\n");
   displayQueue(&jQHead, 0);
 
@@ -99,13 +99,13 @@ int main(void){
                 Proc_Info *tmpRyPtr = rQHead;
                 printf("Ready Queue Head %d\n", rQHead->id);
                 printf("Ry Ptr: %d", tmpRyPtr->id);
-                Proc_Info *prevRyNode = NULL;
+                Proc_Info *prevRyNode = (Proc_Info *)calloc(1, sizeof(Proc_Info));
                 while (tmpRyPtr != NULL){
                   if (tmpJbLpPtr->exec_time < tmpRyPtr->exec_time){
                       printf("Loop executes\n");
 
                       //Impt to malloc new memory space to save the process to prevent memory leak causing unexpected behaviour
-                      Proc_Info *switchProc = (Proc_Info *)malloc(sizeof(Proc_Info));
+                      Proc_Info *switchProc = (Proc_Info *)calloc(1, sizeof(Proc_Info));
                       printf("Got to here\n");
                       Proc_Info *remJobNode = deQueueFrom(&prevJbNode, &tmpJbLpPtr);
                       *switchProc = *remJobNode;
@@ -125,23 +125,21 @@ int main(void){
                           rQHead = switchProc;
                           displayQueue(&tmpJbLpPtr, 0);
                       } else {
-                          printf("Wello\n");
+                          printf("Wello1\n");
+                          //printf("prevNode Debug %d\n", prevRyNode->id);
                           //If at front of ready queue
                           if (prevRyNode == NULL){
                               switchProc->next = rQHead;
                               rQHead = switchProc;
-                              printMsg("Got to here");
-                              displayQueue(&rQHead, 1);
-                              printMsg("Got to here");
                           } else {
-                              printf("Wello\n");
                               prevRyNode->next = switchProc;
                               switchProc->next = tmpRyPtr;
+                              printMsg("Wello 2");
                           }
                       }
                   }
                   printMsg("Got to here");
-                  prevRyNode = tmpRyPtr;
+                  *prevRyNode = *tmpRyPtr;
                   tmpRyPtr = tmpRyPtr->next;
                 }
                 printMsg("Got to here");
@@ -284,6 +282,7 @@ void displayQueue(Proc_Info **queueHdPtr, int type){
       temp = temp->next;
     }
     printf("\n");
+    printMsg("Testing 123");
 }
 
 void printMsg(char * msg){
