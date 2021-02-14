@@ -7,6 +7,7 @@ Circular Queue Implementation referenced from https://www.programiz.com/dsa/circ
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <string.h>
 
 typedef struct proc_struct {
     int id;
@@ -19,11 +20,8 @@ typedef struct proc_struct {
 /* TO-DOs
 - Continue Algorithm Development
 
-Ideas from 13/2
-- Have a pointer that keeps track of all processes
-- Continue using current loop pointer
-- Search for current looped process and remove it from pointer keeping track of process
-- Save Minimum in loop
+Ideas from 14/2
+ - Needa continue bug fixes on queues
 */
 
 void displayQueue(Proc_Info **, int);
@@ -93,6 +91,7 @@ int main(void) {
     while (tmpJbLpPtr != NULL) {
         bool jobToFree = false;
         printf("Queue status\n");
+        displayQueue(&jQHead, 0);
         printf("Processing Jobs %d\n", tmpJbLpPtr->id);
         if (tmpJbLpPtr->arr_time == elapsedTime) {
             printf("process arrives\n");
@@ -139,11 +138,13 @@ int main(void) {
                     prevRyNode = tmpRyPtr;
                     tmpRyPtr = tmpRyPtr->next;
                     displayQueue(&rQHead, 1);
+                    displayQueue(&jQHead, 0);
                 }
                 if (addToBack) {
                     printMsg("Hello There");
                     //insert in the queue at (++tail) position, since process has higher execution time than all in ready queue
                     enQueue(tmpJbLpPtr, &rQHead);
+                    jobToFree = true;
                 }
             }
         }
@@ -154,7 +155,6 @@ int main(void) {
         if (tmpJbLpPtr->next != NULL) {
             printf("Next values %d\n", (tmpJbLpPtr->next)->id);
         }
-
         // If Job has been moved to ready queue remove it from job queue
         if (jobToFree) {
             Proc_Info *savedCurrJb = (Proc_Info *) calloc(1, sizeof(Proc_Info));
@@ -228,19 +228,24 @@ int main(void) {
 
 //Adds a process to the back of a linked list
 void enQueue(Proc_Info *proc, Proc_Info **queueHdPtr) {
-    printf("DEBUG2: Arr time %d", proc->arr_time);
+    printf("DEBUG2: Arr time %d\n", proc->arr_time);
+
+    //Allocate space to hold copy of the current process
+    Proc_Info *tempProc = (Proc_Info *) calloc(1, sizeof(Proc_Info));
+    //Change value to tempProc pointer to current process
+    *tempProc = *proc;
     if (*queueHdPtr == NULL) {
-        proc->next = *queueHdPtr;
-        *queueHdPtr = proc;
+        tempProc->next = *queueHdPtr;
+        *queueHdPtr = tempProc;
     } else if (*queueHdPtr != NULL) {
         //Defining a temporary pointer variable to hold head
         Proc_Info *temp = *queueHdPtr;
-        proc->next = NULL;
+        tempProc->next = NULL;
 
         while (temp->next != NULL) {
             temp = temp->next;
         }
-        temp->next = proc;
+        temp->next = tempProc;
     }
 }
 
@@ -272,7 +277,7 @@ void deQueueProcNo(int procNo, Proc_Info **queueHdPtr) {
         if (temp->id == procNo) {
             remNode = temp;
             if (prevNode == NULL) {
-                *queueHdPtr = NULL;
+                *queueHdPtr = (*queueHdPtr)->next;
             } else if (prevNode != NULL) {
                 prevNode->next = temp->next;
             }
@@ -280,6 +285,7 @@ void deQueueProcNo(int procNo, Proc_Info **queueHdPtr) {
         prevNode = temp;
         temp = temp->next;
     }
+
     printf("%d\n", remNode->id);
     //free(remNode);
 }
@@ -296,18 +302,31 @@ bool isQueueEmpty(Proc_Info *queueHdPtr) {
 //Loops through and prints the contents of a linked list
 void displayQueue(Proc_Info **queueHdPtr, int type) {
     Proc_Info *temp = *queueHdPtr;
-    if (temp == NULL) {
-        printf("No processes in queue\n");
-    } else {
-        if (type == 0) {
-            printf("Processes in job queue: \n");
-        } else if (type == 1) {
-            printf("Processes in ready queue: \n");
-        }
+    char *queueType = (char *) malloc(sizeof(char) * 7);
+
+    if (type == 0) {
+        strncpy(queueType, "Job", 3);
+        queueType[3] = '\0';
+    } else if (type == 1) {
+        strncpy(queueType, "Ready", 5);
+        queueType[5] = '\0';
     }
 
+    if (temp == NULL) {
+        printf("No processes in %s queue\n", queueType);
+    } else {
+        printf("Processes in %s queue: \n", queueType);
+    }
+
+    //Free memory for the temporary queueType string
+    free(queueType);
+
     while (temp != NULL) {
-        printf("%d => ", temp->id);
+        if (temp->next != NULL) {
+            printf("%d => ", temp->id);
+        } else if (temp->next == NULL) {
+            printf("%d", temp->id);
+        }
         temp = temp->next;
     }
     printf("\n");
