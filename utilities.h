@@ -12,7 +12,9 @@ typedef struct proc_struct {
     int bst_time;
     int arr_time;
     int exe_time;
-    bool alloc;
+	// -1 - new, 0 - In Ready
+	int status;
+	bool expired; 
 } Proc_Info;
 
 typedef struct node_struct {
