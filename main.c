@@ -73,8 +73,14 @@ int main(void) {
                     } else if (jobs[i].exe_time > tQ) {
                         if (rQHead == NULL) {
                             if (nextProc == NULL) {
-                                elapsedTime += tQ;
-                                jobs[i].exe_time -= tQ;
+                                if (jobs[i].exe_time >= tQ) {
+                                    elapsedTime += tQ;
+                                    jobs[i].exe_time -= tQ;
+                                } else if (jobs[i].exe_time < tQ) {
+                                    elapsedTime += jobs[i].exe_time;
+                                    jobs[i].exe_time -= jobs[i].exe_time;
+                                }
+
                                 procAlloc = true;
                                 enQueueLL(jobs[i], &rQHead);
                             } else {
@@ -94,34 +100,86 @@ int main(void) {
         bool remProc = false;
         Proc_Node *temp = NULL;
 
-        printf("Next proc id %d\n", nextProc->proc_data.id);
-        if (procNodeExists(&rQHead, nextProc->proc_data.id)) {
-            elapsedTime += tQ;
-            nextProc->proc_data.exe_time -= tQ;
-            procAlloc = true;
-
-            if (nextProc->proc_data.exe_time <= 0) {
-                temp = nextProc;
-                remProc = true;
-            }
-
-            nextProc = nextProc->next;
-
-            if (nextProc == NULL) {
-                printMsg("Next Proc is NULL");
-            }
-
-            if (remProc) {
-                if (temp == NULL) {
-                    printMsg("Temp is null");
-                } else {
-                    printf("Temp proc id %d\n", temp->proc_data.id);
+        if (!allProcArr(jobs, numProc)) {
+            printf("Next proc id %d\n", nextProc->proc_data.id);
+            if (procNodeExists(&rQHead, nextProc->proc_data.id)) {
+                if (nextProc->proc_data.exe_time >= tQ) {
+                    elapsedTime += tQ;
+                    nextProc->proc_data.exe_time -= tQ;
+                    procAlloc = true;
+                } else if (nextProc->proc_data.exe_time < tQ) {
+                    elapsedTime += nextProc->proc_data.exe_time;
+                    nextProc->proc_data.exe_time -= nextProc->proc_data.exe_time;
                 }
-                removeProcessNo(&rQHead, temp->proc_data.id);
-                displayQueue(&rQHead);
+
+
+                if (nextProc->proc_data.exe_time <= 0) {
+                    temp = nextProc;
+                    remProc = true;
+                }
+
+                nextProc = nextProc->next;
+
+                if (nextProc == NULL) {
+                    printMsg("Next Proc is NULL");
+                }
+
+                if (remProc) {
+                    if (temp == NULL) {
+                        printMsg("Temp is null");
+                    } else {
+                        printf("Temp proc id %d\n", temp->proc_data.id);
+                    }
+                    removeProcessNo(&rQHead, temp->proc_data.id);
+                    displayQueue(&rQHead);
+                }
+            }
+        } else if (allProcArr(jobs, numProc)) {
+            Proc_Node *tempPtr;
+
+            while (rQHead != NULL) {
+                tempPtr = rQHead;
+                while (tempPtr != NULL) {
+                    remProc = false;
+                    if (procNodeExists(&rQHead, tempPtr->proc_data.id)) {
+
+                        if (tempPtr->proc_data.exe_time >= tQ) {
+                            elapsedTime += tQ;
+                            tempPtr->proc_data.exe_time -= tQ;
+                            procAlloc = true;
+                        } else if (tempPtr->proc_data.exe_time < tQ) {
+                            elapsedTime += tempPtr->proc_data.exe_time;
+                            tempPtr->proc_data.exe_time -= tempPtr->proc_data.exe_time;
+                        }
+
+                        if (tempPtr->proc_data.exe_time <= 0) {
+                            temp = tempPtr;
+                            printf("Temp proc id %d\n", temp->proc_data.id);
+                            printf("Completion time %d\n", elapsedTime);
+                            remProc = true;
+                        }
+
+                        tempPtr = tempPtr->next;
+
+                        if (tempPtr == NULL) {
+                            printMsg("Next Process is NULL");
+                        }
+
+                        if (remProc) {
+                            if (temp == NULL) {
+                                printMsg("Temp is null");
+                            } else {
+                                printf("Temp proc id %d\n", temp->proc_data.id);
+                            }
+                            removeProcessNo(&rQHead, temp->proc_data.id);
+                            displayQueue(&rQHead);
+                        }
+                    }
+                }
             }
         }
 
+        printf("Current CPU time %d\n", elapsedTime);
 
         if (isQueueEmpty(rQHead)) {
             procAlloc = false;
