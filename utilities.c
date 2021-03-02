@@ -142,18 +142,6 @@ bool procNodeExists(Proc_Node **queueHdPtr, int procId) {
     return false;
 }
 
-bool allProcArr(Proc_Info jobs[], int numProc) {
-    bool allArr = true;
-
-    for (int i = 0; i < numProc; i++) {
-        if (jobs[i].status == -1) {
-            allArr = false;
-        }
-    }
-
-    return allArr;
-}
-
 bool isQueueEmpty(Proc_Node *queueHdPtr) {
     if (queueHdPtr == NULL) {
         return true;

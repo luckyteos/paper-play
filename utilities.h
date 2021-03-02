@@ -14,7 +14,7 @@ typedef struct proc_struct {
     int exe_time;
     // -1 - new, 0 - Arrived
     int status;
-    bool expired;
+    int comp_time;
 } Proc_Info;
 
 typedef struct node_struct {
@@ -38,8 +38,6 @@ bool procNodeExists(Proc_Node **, int);
 void removeProcessNo(Proc_Node **, int);
 
 void insertSort(Proc_Node **);
-
-bool allProcArr(Proc_Info[], int);
 
 bool isQueueEmpty(Proc_Node *);
 
