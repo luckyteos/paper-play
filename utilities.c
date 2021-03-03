@@ -107,6 +107,7 @@ void removeProcessNo(Proc_Node **queueHdPtr, int procId) {
     }
 }
 
+//Given a process number, find it in the queue and remove its associated node
 void deQueueProcNoLL(int procNo, Proc_Node **queueHdPtr) {
     Proc_Node *temp = *queueHdPtr;
     Proc_Node *prevNode = NULL;
@@ -125,8 +126,8 @@ void deQueueProcNoLL(int procNo, Proc_Node **queueHdPtr) {
         temp = temp->next;
     }
 
-    printf("%d\n", remNode->proc_data.id);
-    //free(remNode);
+    printf("DEBUG: Removed Process %d\n", remNode->proc_data.id);
+    free(remNode);
 }
 
 bool procNodeExists(Proc_Node **queueHdPtr, int procId) {
@@ -170,15 +171,19 @@ void displayQueue(Proc_Node **queueHdPtr) {
     printf("\n");
 }
 
+//Insert a new node into the queue, in ascending order
 void sortedInsert(Proc_Node **queueHdPtr, Proc_Node *newNode) {
     Proc_Node *current;
 
     //If queue is empty then no need to sort
     if (isQueueEmpty(*queueHdPtr)) {
         *queueHdPtr = newNode;
+	  //If execution time of the first element in queue is more than or equal to the node to be added
     } else if ((*queueHdPtr)->proc_data.exe_time >= newNode->proc_data.exe_time) {
+		//Put the node to be added before the first element in queue
         newNode->next = *queueHdPtr;
         newNode->next->prev = newNode;
+		//Update the first element in the queue to newNode
         *queueHdPtr = newNode;
     } else {
         current = *queueHdPtr;
@@ -206,6 +211,7 @@ void sortedInsert(Proc_Node **queueHdPtr, Proc_Node *newNode) {
     }
 }
 
+//Traverse the ready queue, sort the processes by exec time, then return the sorted ready queue
 void insertSort(Proc_Node **queueHdPtr) {
     Proc_Node *temp = *queueHdPtr;
     Proc_Node *sortHead = NULL;
@@ -217,7 +223,7 @@ void insertSort(Proc_Node **queueHdPtr) {
         //Removing links from temp so it can be used as a node for insertion
         temp->prev = NULL;
         temp->next = NULL;
-
+		
         sortedInsert(&sortHead, temp);
 
         //Set to continue loop traversal
