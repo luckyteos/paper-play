@@ -4,6 +4,7 @@ from paper on Efficient Process Scheduling Algorothm using RR and SRTF by Preet
 Sinha et al.
 */
 #include "utilities.h"
+#include <time.h>
 
 /* TO-DOs
 	Idea behind Algorithm
@@ -17,6 +18,9 @@ int numProc;
 Proc_Node *nextProc = NULL;
 
 int main(void) {
+	//Start the system clock
+	clock_t begin = clock();
+
 	int execTime, arrTime, tQ;
 	// Step 1:
 	// First take input of no. of processes into n.
@@ -68,9 +72,12 @@ int main(void) {
 						if (rQHead == NULL) {
 							// if CPU IDLE means no next process to be executed
 							if (nextProc == NULL) {
+								//Increment CPU time
 								elapsedTime += jobs[i].exe_time;
 								printf("DEBUG: Elapsed Time %d\n", elapsedTime);
+								//Update exec_time of process
 								jobs[i].exe_time -= jobs[i].exe_time;
+								//Update completion time of process
 								jobs[i].comp_time = elapsedTime;
 								procAlloc = true;
 							} else {
@@ -105,6 +112,7 @@ int main(void) {
 					insertSort(&rQHead);
 					printMsg("Reached Here");
 					displayQueue(&rQHead);
+					//Set next process as first process in ready queue
 					nextProc = rQHead;
 				}
 			}
@@ -180,5 +188,10 @@ int main(void) {
 	// Print average turnaround and waiting times for all processes
 	printf("Average Turnaround Time %.2f\n", taSum / numProc);
 	printf("Average Waiting Time %.2f\n", waitSum / numProc);
+
+	//Calculate total time taken for program execution
+	clock_t end = clock();
+	double progTime = (double)(end - begin)/CLOCKS_PER_SEC;
+	printf("Program Exec Time: %f\n", progTime);
 	return 0;
 }
