@@ -18,52 +18,58 @@ int numProc;
 Proc_Node *nextProc = NULL;
 
 int main(void) {
-	//Start the system clock
-	clock_t begin = clock();
+    //Start the system clock
+    clock_t begin = clock();
 
-	int execTime, arrTime, tQ;
-	// Step 1:
-	// First take input of no. of processes into n.
-	printf("Please input the number of processes: ");
-	scanf("%d", &numProc);
+    //arrInxCt holds the length of the gantt chart array
+    int arrInxCt = 0;
+    double execTime, arrTime;
+    double tQ;
 
-	// Setting up array to hold the number of jobs desired by user
-	Proc_Info jobs[numProc];
-	// Setting up the ready queue to contain jobs ready to executed
-	Proc_Node *rQHead = NULL;
+    //For Use with printing out the gantt chart
+    double ganttArr[200];
+    // Step 1:
+    // First take input of no. of processes into n.
+    printf("Please input the number of processes: ");
+    scanf("%d", &numProc);
+
+    // Setting up array to hold the number of jobs desired by user
+    Proc_Info jobs[numProc];
+    // Setting up the ready queue to contain jobs ready to executed
+    Proc_Node *rQHead = NULL;
 
 	// Take input of bst_time and arr_time and queue processes into job queue
 	for (int i = 0; i < numProc; i++) {
-		printf("Please input the execution time of process %d\n", i + 1);
-		scanf("%d", &execTime);
-		printf("Please input the arrival time of process %d\n", i + 1);
-		scanf("%d", &arrTime);
-		jobs[i].id = i + 1;
-		jobs[i].bst_time = execTime;
-		jobs[i].exe_time = execTime;
-		jobs[i].arr_time = arrTime;
-		// Set initial status of process to -1, meaning process has not arrived
-		// yet
-		jobs[i].status = -1;
-		// Set initial completion time of process to -10, meaning process has
-		// not completed yet
-		jobs[i].comp_time = -10;
-	}
-	printf("Please input your desired time quantum: \n");
-	scanf("%d", &tQ);
+        printf("Please input the execution time of process %d\n", i + 1);
+        scanf("%lf", &execTime);
+        printf("Please input the arrival time of process %d\n", i + 1);
+        scanf("%lf", &arrTime);
+        jobs[i].id = i + 1;
+        jobs[i].bst_time = execTime;
+        jobs[i].exe_time = execTime;
+        jobs[i].arr_time = arrTime;
+        // Set initial status of process to -1, meaning process has not arrived
+        // yet
+        jobs[i].status = -1;
+        // Set initial completion time of process to -10, meaning process has
+        // not completed yet
+        jobs[i].comp_time = -10;
+    }
+    printf("Please input your desired time quantum: \n");
+    scanf("%lf", &tQ);
 
-	// Initiliase elapsedTime to track CPU Time
-	int elapsedTime = 0;
-	// Initialise schRunning to tell if scheduler should run
-	bool schRunning = true;
-	// Intiliase procAlloc to track if process has been allocated to the CPU
-	bool procAlloc = false;
+    // Initiliase elapsedTime to track CPU Time
+    double elapsedTime = 0;
+    // Initialise schRunning to tell if scheduler should run
+    bool schRunning = true;
+    // Intiliase procAlloc to track if process has been allocated to the CPU
+    bool procAlloc = false;
 
-	while (schRunning) {
-		for (int i = 0; i < sizeof(jobs) / sizeof(jobs[0]); i++) {
-			// If Process has not arrived yet
-			if (jobs[i].status == -1) {
-				if (jobs[i].arr_time <= elapsedTime) {
+    while (schRunning) {
+        for (int i = 0; i < sizeof(jobs) / sizeof(jobs[0]); i++) {
+            // If Process has not arrived yet
+            if (jobs[i].status == -1) {
+                if (jobs[i].arr_time <= elapsedTime) {
 					// Set status = 0, indicating process has arrived
 					jobs[i].status = 0;
 					// If exec_time is less than or equals to quantum
@@ -72,15 +78,22 @@ int main(void) {
 						if (rQHead == NULL) {
 							// if CPU IDLE means no next process to be executed
 							if (nextProc == NULL) {
-								//Increment CPU time
-								elapsedTime += jobs[i].exe_time;
-								printf("DEBUG: Elapsed Time %d\n", elapsedTime);
-								//Update exec_time of process
-								jobs[i].exe_time -= jobs[i].exe_time;
-								//Update completion time of process
-								jobs[i].comp_time = elapsedTime;
-								procAlloc = true;
-							} else {
+                                //Increment CPU time
+                                elapsedTime += jobs[i].exe_time;
+                                printf("DEBUG: Elapsed Time %f\n", elapsedTime);
+
+                                //Just some code to help with printing gantt chart
+                                ganttArr[arrInxCt] = jobs[i].id;
+                                ganttArr[arrInxCt + 1] = jobs[i].exe_time;
+                                ganttArr[arrInxCt + 2] = elapsedTime;
+                                arrInxCt += 3;
+
+                                //Update exec_time of process
+                                jobs[i].exe_time -= jobs[i].exe_time;
+                                //Update completion time of process
+                                jobs[i].comp_time = elapsedTime;
+                                procAlloc = true;
+                            } else {
 								enQueueLL(jobs[i], &rQHead);
 							}
 						} else {
@@ -90,15 +103,27 @@ int main(void) {
 						if (rQHead == NULL) {
 							if (nextProc == NULL) {
 								if (jobs[i].exe_time >= tQ) {
-									elapsedTime += tQ;
-									printf(
-										"DEBUG: Elapsed Time %d\n",
-										elapsedTime);
-									jobs[i].exe_time -= tQ;
-								} else if (jobs[i].exe_time < tQ) {
-									elapsedTime += jobs[i].exe_time;
-									jobs[i].exe_time -= jobs[i].exe_time;
-								}
+                                    elapsedTime += tQ;
+                                    printf("DEBUG: Elapsed Time %f\n", elapsedTime);
+
+                                    //Just some code to help with printing gantt chart
+                                    ganttArr[arrInxCt] = jobs[i].id;
+                                    ganttArr[arrInxCt + 1] = tQ;
+                                    ganttArr[arrInxCt + 2] = elapsedTime;
+                                    arrInxCt += 3;
+
+                                    jobs[i].exe_time -= tQ;
+                                } else if (jobs[i].exe_time < tQ) {
+                                    elapsedTime += jobs[i].exe_time;
+
+                                    //Just some code to help with printing gantt chart
+                                    ganttArr[arrInxCt] = jobs[i].id;
+                                    ganttArr[arrInxCt + 1] = jobs[i].exe_time;
+                                    ganttArr[arrInxCt + 2] = elapsedTime;
+                                    arrInxCt += 3;
+
+                                    jobs[i].exe_time -= jobs[i].exe_time;
+                                }
 
 								procAlloc = true;
 								enQueueLL(jobs[i], &rQHead);
@@ -133,15 +158,28 @@ int main(void) {
 				}
 				// Allocate CPU to next_process in queue, up to time quantum
 				if (nextProc->proc_data.exe_time < tQ) {
-					procAlloc = true;
-					elapsedTime += nextProc->proc_data.exe_time;
-					nextProc->proc_data.exe_time -=
-						nextProc->proc_data.exe_time;
-				} else if (nextProc->proc_data.exe_time >= tQ) {
-					procAlloc = true;
-					elapsedTime += tQ;
-					nextProc->proc_data.exe_time -= tQ;
-				}
+                    procAlloc = true;
+                    elapsedTime += nextProc->proc_data.exe_time;
+
+                    //Just some code to help with printing gantt chart
+                    ganttArr[arrInxCt] = nextProc->proc_data.id;
+                    ganttArr[arrInxCt + 1] = nextProc->proc_data.exe_time;
+                    ganttArr[arrInxCt + 2] = elapsedTime;
+                    arrInxCt += 3;
+
+                    nextProc->proc_data.exe_time -= nextProc->proc_data.exe_time;
+                } else if (nextProc->proc_data.exe_time >= tQ) {
+                    procAlloc = true;
+                    elapsedTime += tQ;
+
+                    //Just some code to help with printing gantt chart
+                    ganttArr[arrInxCt] = nextProc->proc_data.id;
+                    ganttArr[arrInxCt + 1] = tQ;
+                    ganttArr[arrInxCt + 2] = elapsedTime;
+                    arrInxCt += 3;
+
+                    nextProc->proc_data.exe_time -= tQ;
+                }
 
 				// If Process has completed execution
 				if (nextProc->proc_data.exe_time <= 0) {
@@ -155,18 +193,18 @@ int main(void) {
 				// Set the next_process to be executed
 				nextProc = nextProc->next;
 
-				// Remove process if it is flagged
-				if (remProc) {
-					remProc = false;
-					deQueueProcNoLL(temp->proc_data.id, &rQHead);
-				}
-			} else {
-				schRunning = false;
-			}
-		}
-		displayQueue(&rQHead);
-		printf("Current CPU time %d\n", elapsedTime);
-	}
+                // Remove process if it is flagged
+                if (remProc) {
+                    remProc = false;
+                    deQueueProcNoLL(temp->proc_data.id, &rQHead);
+                }
+            } else {
+                schRunning = false;
+            }
+        }
+        displayQueue(&rQHead);
+        printf("Current CPU time %f\n", elapsedTime);
+    }
 
 	printf("Final Times\n");
 
@@ -179,19 +217,22 @@ int main(void) {
 		printf("Process %d\n", jobs[z].id);
 		taTime = jobs[z].comp_time - jobs[z].arr_time;
 		printf("Turnaround time %.2f\n", taTime);
-		waitTime = taTime - jobs[z].bst_time;
-		printf("Waiting time %.2f\n", waitTime);
-		taSum += taTime;
-		waitSum += waitTime;
-	}
+        waitTime = taTime - jobs[z].bst_time;
+        printf("Waiting time %.2f\n", waitTime);
+        taSum += taTime;
+        waitSum += waitTime;
+    }
 
-	// Print average turnaround and waiting times for all processes
-	printf("Average Turnaround Time %.2f\n", taSum / numProc);
-	printf("Average Waiting Time %.2f\n", waitSum / numProc);
+    // Print average turnaround and waiting times for all processes
+    printf("Average Turnaround Time %.2f\n", taSum / numProc);
+    printf("Average Waiting Time %.2f\n", waitSum / numProc);
 
-	//Calculate total time taken for program execution
-	clock_t end = clock();
-	double progTime = (double)(end - begin)/CLOCKS_PER_SEC;
-	printf("Program Exec Time: %f\n", progTime);
-	return 0;
+    //To print out the gantt chart, mostly for report and debugging purposes
+    printGantt(ganttArr, arrInxCt);
+
+    //Calculate total time taken for program execution
+    clock_t end = clock();
+    double progTime = (double) (end - begin) / CLOCKS_PER_SEC;
+    printf("Program Exec Time: %f\n", progTime);
+    return 0;
 }
