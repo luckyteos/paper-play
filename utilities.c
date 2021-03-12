@@ -234,6 +234,8 @@ void insertSort(Proc_Node **queueHdPtr) {
     *queueHdPtr = sortHead;
 }
 
+
+//Utility Function to print out the gantt chart
 void printGantt(double valArr[], int arrLen) {
     for (int z = 0; z < arrLen; z += 3) {
         int execTime = (int) round(valArr[z + 1]);
