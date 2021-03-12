@@ -223,7 +223,7 @@ void insertSort(Proc_Node **queueHdPtr) {
         //Removing links from temp so it can be used as a node for insertion
         temp->prev = NULL;
         temp->next = NULL;
-		
+
         sortedInsert(&sortHead, temp);
 
         //Set to continue loop traversal
@@ -232,6 +232,83 @@ void insertSort(Proc_Node **queueHdPtr) {
 
     //Update queue head to point to sorted queue
     *queueHdPtr = sortHead;
+}
+
+void printGantt(double valArr[], int arrLen) {
+    for (int z = 0; z < arrLen; z += 3) {
+        int execTime = (int) round(valArr[z + 1]);
+        if (execTime > 10 && execTime <= 500) {
+            execTime = execTime / 10;
+        } else if (execTime > 500) {
+            execTime = execTime / 100;
+        }
+        for (int i = 0; i < execTime; i++) {
+            if (i == 0) {
+                printf("|");
+            }
+            printf("-");
+            if (execTime == 1) {
+                printf("-");
+            }
+        }
+        if (z == arrLen - 3) {
+            printf("|");
+        }
+    }
+    printf("\n");
+
+    for (int g = 0; g < arrLen; g += 3) {
+        int procId = valArr[g];
+        int execTime = (int) round(valArr[g + 1]);
+        if (execTime > 10 && execTime <= 500) {
+            execTime = execTime / 10;
+        } else if (execTime > 500) {
+            execTime = execTime / 100;
+        }
+        for (int i = 0; i < execTime; i++) {
+            if (i == 0) {
+                printf("|");
+                if (execTime == 1) {
+                    printf("P%d", procId);
+                }
+            } else if (i != execTime / 2) {
+                printf(" ");
+            } else {
+                printf("P%d", procId);
+            }
+        }
+        if (g == arrLen - 3) {
+            printf("|");
+        }
+    }
+    printf("\n");
+
+    for (int y = 0; y < arrLen; y += 3) {
+        int execTime = (int) round(valArr[y + 1]);
+        double burstTime = valArr[y + 1];
+        double compTime = valArr[y + 2];
+        double startTime = compTime - burstTime;
+        if (execTime > 10 && execTime <= 500) {
+            execTime = execTime / 10;
+        } else if (execTime > 500) {
+            execTime = execTime / 100;
+        }
+        for (int i = 0; i < execTime; i++) {
+            if (i == 0) {
+                printf("%.2f", startTime);
+            }
+            if (i != execTime - 1 && execTime > 2) {
+                printf("-");
+            } else {
+                printf("-");
+            }
+        }
+        if (y == arrLen - 3) {
+            printf("%.2f", compTime);
+        }
+    }
+    printf("\n");
+
 }
 
 void printMsg(char *msg) {

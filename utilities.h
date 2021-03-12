@@ -6,15 +6,16 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <math.h>
 
 typedef struct proc_struct {
     int id;
-    int bst_time;
-    int arr_time;
-    int exe_time;
+    double bst_time;
+    double arr_time;
+    double exe_time;
     // -1 - new, 0 - Arrived
     int status;
-    int comp_time;
+    double comp_time;
 } Proc_Info;
 
 typedef struct node_struct {
@@ -40,6 +41,8 @@ void removeProcessNo(Proc_Node **, int);
 void insertSort(Proc_Node **);
 
 bool isQueueEmpty(Proc_Node *);
+
+void printGantt(double [], int);
 
 void printMsg(char *);
 
