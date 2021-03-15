@@ -6,7 +6,7 @@
 
 //Adds a process to the back of a linked list
 void enQueueLL(Proc_Info proc, Proc_Node **queueHdPtr) {
-    printf("DEBUG2: Arr time %d\n", proc.arr_time);
+    printf("DEBUG2: Arr time %f\n", proc.arr_time);
 
     Proc_Node *newNode = (Proc_Node *) malloc(sizeof(Proc_Node));
 
@@ -255,7 +255,6 @@ void printGantt(double valArr[], int arrLen) {
     printf("\n");
 
     for (int y = 0; y < arrLen; y += 3) {
-        int execTime = (int) round(valArr[y + 1]);
         double burstTime = valArr[y + 1];
         double compTime = valArr[y + 2];
         double startTime = compTime - burstTime;
