@@ -237,23 +237,9 @@ void insertSort(Proc_Node **queueHdPtr) {
 
 //Utility Function to print out the gantt chart
 void printGantt(double valArr[], int arrLen) {
-    for (int z = 0; z < arrLen; z += 3) {
-        int execTime = (int) round(valArr[z + 1]);
-        if (execTime > 10 && execTime <= 500) {
-            execTime = execTime / 10;
-        } else if (execTime > 500) {
-            execTime = execTime / 100;
-        }
-        for (int i = 0; i < execTime; i++) {
-            if (i == 0) {
-                printf("|");
-            }
-            printf("-");
-            if (execTime == 1) {
-                printf("-");
-            }
-        }
-        if (z == arrLen - 3) {
+    for (int h = 0; h < arrLen; h += 3) {
+        printf("|----------");
+        if (h == arrLen - 3) {
             printf("|");
         }
     }
@@ -261,24 +247,7 @@ void printGantt(double valArr[], int arrLen) {
 
     for (int g = 0; g < arrLen; g += 3) {
         int procId = valArr[g];
-        int execTime = (int) round(valArr[g + 1]);
-        if (execTime > 10 && execTime <= 500) {
-            execTime = execTime / 10;
-        } else if (execTime > 500) {
-            execTime = execTime / 100;
-        }
-        for (int i = 0; i < execTime; i++) {
-            if (i == 0) {
-                printf("|");
-                if (execTime == 1) {
-                    printf("P%d", procId);
-                }
-            } else if (i != execTime / 2) {
-                printf(" ");
-            } else {
-                printf("P%d", procId);
-            }
-        }
+        printf("|    P%d    ", procId);
         if (g == arrLen - 3) {
             printf("|");
         }
@@ -290,21 +259,28 @@ void printGantt(double valArr[], int arrLen) {
         double burstTime = valArr[y + 1];
         double compTime = valArr[y + 2];
         double startTime = compTime - burstTime;
-        if (execTime > 10 && execTime <= 500) {
-            execTime = execTime / 10;
-        } else if (execTime > 500) {
-            execTime = execTime / 100;
-        }
-        for (int i = 0; i < execTime; i++) {
-            if (i == 0) {
-                printf("%.2f", startTime);
+        printf("%.2f", startTime);
+
+        //Formatting number of dashes based on length of startTime
+
+        if (y == 0) {
+            if (startTime < 1000) {
+                printf("-----");
+            } else if (startTime >= 1000) {
+                printf("----");
             }
-            if (i != execTime - 1 && execTime > 2) {
-                printf("-");
-            } else {
-                printf("-");
+        } else {
+            if (startTime < 10) {
+                printf("-------");
+            } else if (startTime >= 10 && startTime < 100) {
+                printf("------");
+            } else if (startTime >= 100 && startTime < 1000) {
+                printf("-----");
+            } else if (startTime >= 1000) {
+                printf("----");
             }
         }
+
         if (y == arrLen - 3) {
             printf("%.2f", compTime);
         }
